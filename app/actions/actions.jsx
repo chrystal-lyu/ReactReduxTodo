@@ -22,7 +22,7 @@ export var addTodo = (todo) => {
 };
 
 export var startAddTodo = (text) => {
-  return (dispatch, getState)=> {
+  return (dispatch, getState) => {
     var todo = {
         text,
         completed: false,
@@ -44,6 +44,26 @@ export var addTodos = (todos) => {
   return {
     type: 'ADD_TODOS',
     todos
+  };
+};
+
+export var startAddTodos = (text) => {
+  return (dispatch, getState) => {
+    var todosRef = firebaseRef.child('todos');
+
+    return todosRef.once('value').then((snapshot) => {
+      var todos = snapshot.val() || {};
+      var parsedTodos = [];
+
+      Object.keys(todos).forEach((todoId) => {
+        parsedTodos.push({
+          id: todoId,
+          ...todos[todoId]
+        });
+      });
+
+      dispatch(addTodos(parsedTodos));
+    });
   };
 };
 
